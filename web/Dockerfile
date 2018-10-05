@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y wget \
 
 RUN go get -u github.com/labstack/echo
 RUN go get -u github.com/dgrijalva/jwt-go
+RUN go get gopkg.in/go-playground/validator.v9
 RUN go get -u github.com/go-sql-driver/mysql
 RUN go get github.com/jmoiron/sqlx
 
