@@ -2,10 +2,14 @@ package main
 
 import (
     "net/http"
+    "log"
 
     "github.com/labstack/echo"
     "github.com/labstack/echo/middleware"
     "gopkg.in/go-playground/validator.v9"
+
+    _ "github.com/go-sql-driver/mysql"
+    "github.com/jmoiron/sqlx"
 )
 
 type (
@@ -24,11 +28,20 @@ type (
     }
 )
 
+var db *sqlx.DB
+
 func (cv *CustomValidator) Validate(i interface{}) error {
     return cv.validator.Struct(i)
 }
 
 func main() {
+    var err error
+    db, err = sqlx.Connect("mysql", "signpic:@tcp(db:3306)/signpic_db")
+    if err != nil {
+        log.Fatalln(err)
+    }
+    defer db.Close()
+
     e := echo.New()
 
     e.Use(middleware.Logger())
