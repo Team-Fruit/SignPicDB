@@ -2,7 +2,6 @@ package main
 
 import (
     "log"
-    "time"
     "net/http"
     "database/sql"
 
@@ -69,9 +68,8 @@ func root(c echo.Context) (err error) {
     }
 
     u.IP = c.RealIP()
-    u.UpdatedAt = time.Now().Format(time.RFC3339)
     
-    u.AddUser()
+    u.Push()
 
     return c.JSON(http.StatusOK, u)
 }
