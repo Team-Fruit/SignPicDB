@@ -1,8 +1,10 @@
 package main
 
 import (
-    "net/http"
     "log"
+    "time"
+    "net/http"
+    "database/sql"
 
     "github.com/labstack/echo"
     "github.com/labstack/echo/middleware"
@@ -14,13 +16,16 @@ import (
 
 type (
     User struct {
-        UUID            string `query:"id" validate:"required,len=32"`
-        UserName        string `query:"name" validate:"required"`
-        VersionMod      string `query:"vmod" validate:"required"`
-        VersionModMC    string `query:"vmodmc" validate:"required"`
-        VersionModForge string `query:"vmodforge" validate:"required"`
-        VersionMC       string `query:"vmc" validate:"required"`
-        VersionForge    string `query:"vforge" validate:"required"`
+        UUID            string         `db:"uuid" query:"id" validate:"required,len=32"`
+        UserName        string         `db:"username" query:"name" validate:"required"`
+        IP              string         `db:"ip"`
+        VersionMod      string         `db:"version_mod" query:"vmod" validate:"required"`
+        VersionModMC    string         `db:"version_mod_mc" query:"vmodmc" validate:"required"`
+        VersionModForge string         `db:"version_mod_forge" query:"vmodforge" validate:"required"`
+        VersionMC       string         `db:"version_mc" query:"vmc" validate:"required"`
+        VersionForge    string         `db:"version_forge" query:"vforge" validate:"required"`
+        Message         sql.NullString `db:"message"`
+        UpdatedAt       string         `db:"updated_at"`
     }
 
     CustomValidator struct {
@@ -62,6 +67,12 @@ func root(c echo.Context) (err error) {
     if err = c.Validate(u); err != nil {
         return
     }
+
+    u.IP = c.RealIP()
+    u.UpdatedAt = time.Now().Format(time.RFC3339)
+    
+    u.AddUser()
+
     return c.JSON(http.StatusOK, u)
 }
 

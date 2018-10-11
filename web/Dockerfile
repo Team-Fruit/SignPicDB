@@ -16,5 +16,5 @@ RUN go get github.com/jmoiron/sqlx
 WORKDIR /var/app/
 
 ENTRYPOINT ["dockerize", "-wait", "tcp://db:3306"]
-CMD ["go", "run", "server.go"]
+CMD ["go", "run", "server.go", "database.go"]
 
