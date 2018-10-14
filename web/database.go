@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+
+    "github.com/jmoiron/sqlx"
 )
 
 const user = `REPLACE INTO user (uuid, username, ip, version_mod, version_mod_mc, version_mod_forge, version_mc, version_forge, message) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
@@ -22,7 +24,9 @@ func (u *User) Push() {
 func (w *Where) Pull(offset uint64, limit uint64) (u []User, err error) {
 	ws := w.toSql()
 	if ws != "" {
-		err = db.Select(&u, fmt.Sprintf("SELECT * FROM user WHERE %s LIMIT %d,%d", ws, offset, limit))
+		var nstmt *sqlx.NamedStmt
+		nstmt, err = db.PrepareNamed(fmt.Sprintf("SELECT * FROM user WHERE %s LIMIT %d,%d", ws, offset, limit))
+		nstmt.Select(&u, w)
 	} else {
 		err = db.Select(&u, fmt.Sprintf("SELECT * FROM user LIMIT %d,%d", offset, limit))
 	}
@@ -39,7 +43,7 @@ func (w *Where) toSql() string {
 		tag := tf.Tag
 		fv := vf.Interface().(string)
 		if fv != "" {
-			s = append(s, fmt.Sprintf("%s%s'%s'", tag.Get("db"), tag.Get("operator"), fv))
+			s = append(s, fmt.Sprintf("%s%s:%s", tag.Get("db"), tag.Get("operator"), strings.ToLower(tf.Name)))
 		}
 	}
 
