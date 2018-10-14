@@ -37,9 +37,9 @@ type (
 		Since           string `query:"since" db:"updated_at" operator:">="`
 		Until           string `query:"until" db:"updated_at" operator:"<="`
 	}
-    Count struct {
-        Count uint64
-    }
+	Count struct {
+		Count uint64
+	}
 
 	CustomValidator struct {
 		validator *validator.Validate
@@ -64,8 +64,9 @@ func main() {
 	e.Validator = &CustomValidator{validator: validator.New()}
 
 	e.GET("/", root)
+	e.POST("/", root)
 	e.GET("/list", list)
-    e.GET("/list/count", count)
+	e.GET("/list/count", count)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
@@ -133,7 +134,7 @@ func list(c echo.Context) (err error) {
 }
 
 func count(c echo.Context) (err error) {
-    var count uint64
-    count, err = UserCount()
-    return c.JSON(http.StatusOK, Count{count})
+	var count uint64
+	count, err = UserCount()
+	return c.JSON(http.StatusOK, Count{count})
 }
