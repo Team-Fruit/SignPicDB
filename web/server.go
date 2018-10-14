@@ -4,6 +4,7 @@ import (
     "log"
     "net/http"
     "database/sql"
+    "strconv"
 
     "github.com/labstack/echo"
     "github.com/labstack/echo/middleware"
@@ -25,6 +26,18 @@ type (
         VersionForge    string         `db:"version_forge" query:"vforge" validate:"required"`
         Message         sql.NullString `db:"message"`
         UpdatedAt       string         `db:"updated_at"`
+    }
+    Where struct {
+        UUID            string `query:"id" validate:"omitempty,len=32"`
+        UserName        string `query:"name"`
+        IP              string `query:"ip" validate:"omitempty,ip"`
+        VersionMod      string `query:"vmod"`
+        VersionModMC    string `query:"vmodmc"`
+        VersionModForge string `query:"vmodforge"`
+        VersionMC       string `query:"vmc"`
+        VersionForge    string `query:"vforge"`
+        Since           string `query:"since"`
+        Until           string `query:"until"`
     }
 
     CustomValidator struct {
@@ -54,6 +67,7 @@ func main() {
     e.Validator = &CustomValidator{validator: validator.New()}
 
     e.GET("/", root)
+    e.GET("/list", list)
 
     e.Logger.Fatal(e.Start(":8080"))
 }
@@ -72,5 +86,42 @@ func root(c echo.Context) (err error) {
     u.Push()
 
     return c.JSON(http.StatusOK, u)
+}
+
+func list(c echo.Context) (err error) {
+    var page, pagesize uint64
+    if pagestr := c.QueryParam("page"); pagestr != "" {
+        if page, err = strconv.ParseUint(pagestr, 10, 32); err != nil {
+            return
+        }
+        if page < 1 {
+            page = 1
+        }
+    } else {
+        page = 1
+    }
+    if pagesizestr := c.QueryParam("pagesize"); pagesizestr != "" {
+        if pagesize, err = strconv.ParseUint(pagesizestr, 10, 32); err != nil {
+            return
+        } 
+        if pagesize < 1 {
+            pagesize = 1
+        }
+        if pagesize > 100 {
+            pagesize = 100
+        }
+    } else {
+        pagesize = 100
+    }
+
+    w := new(Where)
+    if err = c.Bind(w); err != nil {
+        return
+    }
+    if err = c.Validate(w); err != nil {
+        return
+    }
+
+    return c.JSON(http.StatusOK, w)
 }
 
