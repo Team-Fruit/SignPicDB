@@ -1,11 +1,4 @@
-FROM golang:stretch
-
-ENV DOCKERIZE_VERSION v0.6.0
-
-RUN apt-get update && apt-get install -y wget \
-    && wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+FROM golang:stretch as builder
 
 RUN go get -u github.com/labstack/echo
 RUN go get -u github.com/dgrijalva/jwt-go
@@ -13,8 +6,25 @@ RUN go get gopkg.in/go-playground/validator.v9
 RUN go get -u github.com/go-sql-driver/mysql
 RUN go get github.com/jmoiron/sqlx
 
-WORKDIR /var/app/
+WORKDIR /go/src/github.com/Team-Fruit/SignPicDB/
+COPY . .
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o app .
+
+FROM alpine
+
+ENV DOCKERIZE_VERSION v0.6.0
+
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /root/
+
+RUN apk update && apk add -y wget \
+    && wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+
+COPY --from=builder /go/src/github.com/Team-Fruit/SignPicDB/app .
 
 ENTRYPOINT ["dockerize", "-wait", "tcp://db:3306"]
-CMD ["go", "run", "server.go", "database.go"]
-
+CMD ["./app"]

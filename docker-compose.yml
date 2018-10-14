@@ -4,8 +4,6 @@ services:
         build: ./web
         ports:
             - '8080:8080'
-        volumes:
-            - ./web:/var/app
         environment:
             ALIAS: '/'
         depends_on:
