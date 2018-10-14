@@ -1,7 +1,6 @@
 package main
 
 import (
-    "log"
     "net/http"
     "strconv"
 
@@ -51,11 +50,7 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 }
 
 func main() {
-    var err error
-    db, err = sqlx.Connect("mysql", "signpic:@tcp(db:3306)/signpic_db")
-    if err != nil {
-        log.Fatalln(err)
-    }
+    db = sqlx.MustConnect("mysql", "signpic:@tcp(db:3306)/signpic_db")
     defer db.Close()
 
     e := echo.New()
