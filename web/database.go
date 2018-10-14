@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-    "github.com/jmoiron/sqlx"
+	"github.com/jmoiron/sqlx"
 )
 
 const user = `REPLACE INTO user (uuid, username, ip, version_mod, version_mod_mc, version_mod_forge, version_mc, version_forge, message) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
@@ -22,10 +22,11 @@ func (u *User) Push() {
 }
 
 func (w *Where) Pull(offset uint64, limit uint64) (u []User, err error) {
-	ws := w.toSql()
 	if ws != "" {
 		var nstmt *sqlx.NamedStmt
-		nstmt, err = db.PrepareNamed(fmt.Sprintf("SELECT * FROM user WHERE %s LIMIT %d,%d", ws, offset, limit))
+		if nstmt, err = db.PrepareNamed(fmt.Sprintf("SELECT * FROM user WHERE %s LIMIT %d,%d", w.toSql(), offset, limit)); err != nil {
+			return
+		}
 		nstmt.Select(&u, w)
 	} else {
 		err = db.Select(&u, fmt.Sprintf("SELECT * FROM user LIMIT %d,%d", offset, limit))
@@ -51,6 +52,6 @@ func (w *Where) toSql() string {
 }
 
 func UserCount() (c uint64, err error) {
-    err = db.Get(&c, "SELECT count(uuid) FROM user")
-    return
+	err = db.Get(&c, "SELECT count(uuid) FROM user")
+	return
 }
