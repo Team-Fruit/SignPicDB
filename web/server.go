@@ -28,16 +28,16 @@ type (
         UpdatedAt       string         `db:"updated_at"`
     }
     Where struct {
-        UUID            string `query:"id" validate:"omitempty,len=32"`
-        UserName        string `query:"name"`
-        IP              string `query:"ip" validate:"omitempty,ip"`
-        VersionMod      string `query:"vmod"`
-        VersionModMC    string `query:"vmodmc"`
-        VersionModForge string `query:"vmodforge"`
-        VersionMC       string `query:"vmc"`
-        VersionForge    string `query:"vforge"`
-        Since           string `query:"since"`
-        Until           string `query:"until"`
+        UUID            string `query:"id" validate:"omitempty,len=32" db:"uuid" operator:"="`
+        UserName        string `query:"name" db:"username" operator:"="`
+        IP              string `query:"ip" validate:"omitempty,ip" db:"ip" operator:"="`
+        VersionMod      string `query:"vmod" db:"version_mod" operator:"="`
+        VersionModMC    string `query:"vmodmc" db:"version_mod_mc" operator:"="`
+        VersionModForge string `query:"vmodforge" db:"version_mod_forge" operator:"="`
+        VersionMC       string `query:"vmc" db:"version_mc" operator:"="`
+        VersionForge    string `query:"vforge" db:"version_forge" operator:"="`
+        Since           string `query:"since" db:"updated_at" operator:">="`
+        Until           string `query:"until" db:"updated_at" operator:"<="`
     }
 
     CustomValidator struct {
@@ -122,6 +122,11 @@ func list(c echo.Context) (err error) {
         return
     }
 
-    return c.JSON(http.StatusOK, w)
+    var l []User
+    if l, err = w.Pull(pagesize*(page-1), pagesize); err != nil {
+        return
+    }
+
+    return c.JSON(http.StatusOK, l)
 }
 
