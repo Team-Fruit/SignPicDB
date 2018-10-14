@@ -126,6 +126,9 @@ func list(c echo.Context) (err error) {
     if l, err = w.Pull(pagesize*(page-1), pagesize); err != nil {
         return
     }
+    if len(l) == 0 {
+        l = make([]User, 0)
+    }
 
     return c.JSON(http.StatusOK, l)
 }
