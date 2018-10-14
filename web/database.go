@@ -22,9 +22,10 @@ func (u *User) Push() {
 }
 
 func (w *Where) Pull(offset uint64, limit uint64) (u []User, err error) {
+	ws := w.toSql()
 	if ws != "" {
 		var nstmt *sqlx.NamedStmt
-		if nstmt, err = db.PrepareNamed(fmt.Sprintf("SELECT * FROM user WHERE %s LIMIT %d,%d", w.toSql(), offset, limit)); err != nil {
+		if nstmt, err = db.PrepareNamed(fmt.Sprintf("SELECT * FROM user WHERE %s LIMIT %d,%d", ws, offset, limit)); err != nil {
 			return
 		}
 		nstmt.Select(&u, w)
