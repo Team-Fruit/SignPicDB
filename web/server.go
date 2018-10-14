@@ -3,7 +3,6 @@ package main
 import (
     "log"
     "net/http"
-    "database/sql"
     "strconv"
 
     "github.com/labstack/echo"
@@ -16,16 +15,16 @@ import (
 
 type (
     User struct {
-        UUID            string         `db:"uuid" query:"id" validate:"required,len=32"`
-        UserName        string         `db:"username" query:"name" validate:"required"`
-        IP              string         `db:"ip"`
-        VersionMod      string         `db:"version_mod" query:"vmod" validate:"required"`
-        VersionModMC    string         `db:"version_mod_mc" query:"vmodmc" validate:"required"`
-        VersionModForge string         `db:"version_mod_forge" query:"vmodforge" validate:"required"`
-        VersionMC       string         `db:"version_mc" query:"vmc" validate:"required"`
-        VersionForge    string         `db:"version_forge" query:"vforge" validate:"required"`
-        Message         sql.NullString `db:"message"`
-        UpdatedAt       string         `db:"updated_at"`
+        UUID            string `db:"uuid" query:"id" validate:"required,len=32"`
+        UserName        string `db:"username" query:"name" validate:"required"`
+        IP              string `db:"ip"`
+        VersionMod      string `db:"version_mod" query:"vmod" validate:"required"`
+        VersionModMC    string `db:"version_mod_mc" query:"vmodmc" validate:"required"`
+        VersionModForge string `db:"version_mod_forge" query:"vmodforge" validate:"required"`
+        VersionMC       string `db:"version_mc" query:"vmc" validate:"required"`
+        VersionForge    string `db:"version_forge" query:"vforge" validate:"required"`
+        Message         string `db:"message"`
+        UpdatedAt       string `db:"updated_at"`
     }
     Where struct {
         UUID            string `query:"id" validate:"omitempty,len=32" db:"uuid" operator:"="`
@@ -82,7 +81,8 @@ func root(c echo.Context) (err error) {
     }
 
     u.IP = c.RealIP()
-    
+    u.Message = ""
+
     u.Push()
 
     return c.JSON(http.StatusOK, u)

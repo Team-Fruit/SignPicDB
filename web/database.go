@@ -6,7 +6,7 @@ import (
     "reflect"
 )
 
-const user = `REPLACE INTO user (uuid, username, ip, version_mod, version_mod_mc, version_mod_forge, version_mc, version_forge) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+const user = `REPLACE INTO user (uuid, username, ip, version_mod, version_mod_mc, version_mod_forge, version_mc, version_forge, message) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
 func (u *User) Push() {
     db.MustExec(user, u.UUID,
@@ -15,15 +15,16 @@ func (u *User) Push() {
                       u.VersionModMC,
                       u.VersionModForge,
                       u.VersionMC,
-                      u.VersionForge)
+                      u.VersionForge,
+                      u.Message)
 }
 
 func (w *Where) Pull(offset uint64, limit uint64) (u []User, err error) {
     ws := w.toSql()
     if ws != "" {
-        err = db.Select(&u, fmt.Sprintf("SELECT * FROM user WHERE %s LIMIT %d,%d;", ws, offset, limit))
+        err = db.Select(&u, fmt.Sprintf("SELECT * FROM user WHERE %s LIMIT %d,%d", ws, offset, limit))
     } else {
-        err = db.Select(&u, fmt.Sprintf("SELECT * FROM user LIMIT %d,%d;", offset, limit))
+        err = db.Select(&u, fmt.Sprintf("SELECT * FROM user LIMIT %d,%d", offset, limit))
     }
     return
 }
