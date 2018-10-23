@@ -134,7 +134,14 @@ func list(c echo.Context) (err error) {
 }
 
 func count(c echo.Context) (err error) {
+	w := new(Where)
+	if err = c.Bind(w); err != nil {
+		return
+	}
+	if err = c.Validate(w); err != nil {
+		return
+	}
 	var count uint64
-	count, err = UserCount()
+	count, err = w.UserCount()
 	return c.JSON(http.StatusOK, Count{count})
 }

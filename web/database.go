@@ -35,6 +35,20 @@ func (w *Where) Pull(offset uint64, limit uint64) (u []User, err error) {
 	return
 }
 
+func (w *Where) UserCount() (c uint64, err error) {
+	ws := w.toSql()
+	if ws != "" {
+		var nstmt *sqlx.NamedStmt
+		if nstmt, err = db.PrepareNamed("SELECT count(uuid) FROM user WHERE "+ ws); err != nil {
+			return
+		}
+		nstmt.Get(&c, w)
+	} else {
+		err = db.Get(&c, "SELECT count(uuid) FROM user")
+	}
+	return
+}
+
 func (w *Where) toSql() string {
 	s := []string{}
 
@@ -52,7 +66,3 @@ func (w *Where) toSql() string {
 	return strings.Join(s, " AND ")
 }
 
-func UserCount() (c uint64, err error) {
-	err = db.Get(&c, "SELECT count(uuid) FROM user")
-	return
-}
