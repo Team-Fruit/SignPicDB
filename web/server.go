@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/labstack/echo"
@@ -68,7 +69,7 @@ func main() {
 	e.GET("/list", list)
 	e.GET("/list/count", count)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }
 
 func root(c echo.Context) (err error) {
