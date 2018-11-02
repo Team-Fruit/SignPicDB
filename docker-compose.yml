@@ -2,20 +2,28 @@ version: '3'
 services:
     web:
         build: ./web
-        ports:
-            - '8080:8080'
+        expose:
+            - '8082'
         environment:
             ALIAS: '/'
+            PORT: '8082'
         depends_on:
             - db
+        restart: always
     db:
         build: ./db
-        ports:
-            - '3306:3306'
+        expose:
+            - '3306'
         volumes:
             - db:/var/lib/mysql
         environment:
             MYSQL_ROOT_PASSWORD: 'password'
+        restart: always
 volumes:
     db:
+
+networks:
+    default:
+        external:
+            name: nginx_reverse_proxy
 
