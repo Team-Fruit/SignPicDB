@@ -24,6 +24,7 @@ type (
 		VersionMC       string `db:"version_mc" query:"vmc" validate:"required"`
 		VersionForge    string `db:"version_forge" query:"vforge" validate:"required"`
 		Message         string `db:"message"`
+		CreatedAt       string `db:"created_at"`
 		UpdatedAt       string `db:"updated_at"`
 	}
 	Where struct {

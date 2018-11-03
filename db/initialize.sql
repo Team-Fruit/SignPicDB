@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS `signpic_db`.`user` (
     `version_mc`        TINYTEXT        NOT NULL,
     `version_forge`     TINYTEXT        NOT NULL,
     `message`           TEXT            NOT NULL,
-    `updated_at`        TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_at`        TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`updated_at`        TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY ( `uuid` ),
 );
