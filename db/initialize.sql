@@ -16,6 +16,5 @@ CREATE TABLE IF NOT EXISTS `signpic_db`.`user` (
     `updated_at`        TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY ( `uuid` ),
-    UNIQUE KEY `ip` ( `ip` )
 );
 
