@@ -8,12 +8,13 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-const user = `REPLACE INTO user (uuid, username, ip, version_mod, version_mod_mc, version_mod_forge, version_mc, version_forge, message) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+const user = `INSERT INTO user (uuid, username, ip, version_mod, version_mod_mc, version_mod_forge, version_mc, version_forge, message) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE username = VALUES(username), ip = VALUES(ip), version_mod = VALUES(version_mod), version_mod_mc = VALUES(version_mod_mc), version_mod_forge = VALUES(version_mod_forge), version_mc = VALUES(version_mc), version_forge = (version_forge), message = VALUES(message)`
 
 func (u *User) Push() {
 	db.MustExec(user, u.UUID,
 		u.UserName,
-		u.IP, u.VersionMod,
+		u.IP,
+		u.VersionMod,
 		u.VersionModMC,
 		u.VersionModForge,
 		u.VersionMC,
