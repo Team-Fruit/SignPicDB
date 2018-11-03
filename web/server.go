@@ -15,7 +15,7 @@ import (
 
 type (
 	User struct {
-		UUID            string `db:"uuid" query:"id" validate:"required,len=32"`
+		UUID            string `db:"uuid" query:"id" validate:"required,mcuuid"`
 		UserName        string `db:"username" query:"name" validate:"required"`
 		IP              string `db:"ip"`
 		VersionMod      string `db:"version_mod" query:"vmod" validate:"required"`
@@ -27,7 +27,7 @@ type (
 		UpdatedAt       string `db:"updated_at"`
 	}
 	Where struct {
-		UUID              string `query:"id" validate:"omitempty,len=32" db:"uuid" operator:"="`
+		UUID              string `query:"id" validate:"omitempty,mcuuid" db:"uuid" operator:"="`
 		UserName          string `query:"name" db:"username" operator:"="`
 		IP                string `query:"ip" validate:"omitempty,ip" db:"ip" operator:"="`
 		Version_Mod       string `query:"vmod" db:"version_mod" operator:"="`
@@ -53,16 +53,29 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 	return cv.validator.Struct(i)
 }
 
+func uuidValidator(fl validator.FieldLevel) bool {
+	str := fl.Field().String();
+	if len(str) != 32 {
+		return false
+	}
+	if str == "00000000000000000000000000000000" {
+		return false
+	}
+	return true
+}
+
 func main() {
 	db = sqlx.MustConnect("mysql", "signpic:@tcp(db:3306)/signpic_db")
 	defer db.Close()
 
 	e := echo.New()
 
-	e.Use(middleware.Logger())
+	//  e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	e.Validator = &CustomValidator{validator: validator.New()}
+	validator := validator.New()
+	validator.RegisterValidation("mcuuid", uuidValidator)
+	e.Validator = &CustomValidator{validator: validator}
 
 	e.GET("/", root)
 	e.POST("/", root)
