@@ -18,24 +18,25 @@ type (
 		UUID            string `db:"uuid" query:"id" validate:"required,mcuuid"`
 		UserName        string `db:"username" query:"name" validate:"required"`
 		IP              string `db:"ip"`
-		VersionMod      string `db:"version_mod" query:"vmod" validate:"required"`
-		VersionModMC    string `db:"version_mod_mc" query:"vmodmc" validate:"required"`
-		VersionModForge string `db:"version_mod_forge" query:"vmodforge" validate:"required"`
-		VersionMC       string `db:"version_mc" query:"vmc" validate:"required"`
-		VersionForge    string `db:"version_forge" query:"vforge" validate:"required"`
+		VersionMod      string `db:"version_mod" query:"vmod" validate:"required" json:"-"`
+		VersionModMC    string `db:"version_mod_mc" query:"vmodmc" validate:"required" json:"-"`
+		VersionModForge string `db:"version_mod_forge" query:"vmodforge" validate:"required" json:"-"`
+		VersionMC       string `db:"version_mc" query:"vmc" validate:"required" json:"-"`
+		VersionForge    string `db:"version_forge" query:"vforge" validate:"required" json:"-"`
 		Message         string `db:"message"`
 		CreatedAt       string `db:"created_at"`
 		UpdatedAt       string `db:"updated_at"`
+		UpdatedCount    uint   `db:"updated_count"`
 	}
 	Where struct {
 		UUID              string `query:"id" validate:"omitempty,mcuuid" db:"uuid" operator:"="`
 		UserName          string `query:"name" db:"username" operator:"="`
 		IP                string `query:"ip" validate:"omitempty,ip" db:"ip" operator:"="`
-		Version_Mod       string `query:"vmod" db:"version_mod" operator:"="`
-		Version_Mod_MC    string `query:"vmodmc" db:"version_mod_mc" operator:"="`
-		Version_Mod_Forge string `query:"vmodforge" db:"version_mod_forge" operator:"="`
-		Version_MC        string `query:"vmc" db:"version_mc" operator:"="`
-		Version_Forge     string `query:"vforge" db:"version_forge" operator:"="`
+		// Version_Mod       string `query:"vmod" db:"version_mod" operator:"="`
+		// Version_Mod_MC    string `query:"vmodmc" db:"version_mod_mc" operator:"="`
+		// Version_Mod_Forge string `query:"vmodforge" db:"version_mod_forge" operator:"="`
+		// Version_MC        string `query:"vmc" db:"version_mc" operator:"="`
+		// Version_Forge     string `query:"vforge" db:"version_forge" operator:"="`
 		// Since             string `query:"since" db:"updated_at" operator:">="`
 		// Until             string `query:"until" db:"updated_at" operator:"<="`
 	}
@@ -71,7 +72,7 @@ func main() {
 
 	e := echo.New()
 
-	//  e.Use(middleware.Logger())
+	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
 	validator := validator.New()
@@ -98,7 +99,9 @@ func root(c echo.Context) (err error) {
 	u.IP = c.RealIP()
 	u.Message = ""
 
-	u.Push()
+	if err = u.Push(); err != nil {
+		return
+	}
 
 	return c.JSON(http.StatusOK, u)
 }

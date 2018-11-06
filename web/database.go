@@ -8,18 +8,23 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-const user = `INSERT INTO user (uuid, username, ip, version_mod, version_mod_mc, version_mod_forge, version_mc, version_forge, message) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE username = VALUES(username), ip = VALUES(ip), version_mod = VALUES(version_mod), version_mod_mc = VALUES(version_mod_mc), version_mod_forge = VALUES(version_mod_forge), version_mc = VALUES(version_mc), version_forge = (version_forge), message = VALUES(message), updated_at = NOW()`
 
-func (u *User) Push() {
-	db.MustExec(user, u.UUID,
+func (u *User) Push() (err error) {
+	tx := db.MustBegin()
+	tx.MustExec(`INSERT INTO user (uuid, username, ip, message) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE username = VALUES(username), ip = VALUES(ip), message = VALUES(message), updated_at = NOW(), updated_count = updated_count+1`, 
+		u.UUID,
 		u.UserName,
 		u.IP,
+		u.Message)
+	tx.MustExec(`INSERT INTO user__version_mc__version_mod (uuid, version_mod, version_mod_mc, version_mod_forge, version_mc, version_forge) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE version_mod = VALUES(version_mod), version_mod_mc = VALUES(version_mod_mc), version_mod_forge = VALUES(version_mod_forge), version_mc = VALUES(version_mc), version_forge = (version_forge), updated_at = NOW(), updated_count = updated_count + 1`,
+		u.UUID,
 		u.VersionMod,
 		u.VersionModMC,
 		u.VersionModForge,
 		u.VersionMC,
-		u.VersionForge,
-		u.Message)
+		u.VersionForge)
+	err = tx.Commit()
+	return
 }
 
 func (w *Where) Pull(offset uint64, limit uint64) (u []User, err error) {
