@@ -79,8 +79,8 @@ func main() {
 	validator.RegisterValidation("mcuuid", uuidValidator)
 	e.Validator = &CustomValidator{validator: validator}
 
-	e.GET("/", root)
-	e.POST("/", root)
+	e.POST("/msg", root)
+	e.GET("/msg", root)
 	e.GET("/list", list)
 	e.GET("/list/count", count)
 
