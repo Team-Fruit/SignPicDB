@@ -6,7 +6,7 @@ RUN go get gopkg.in/go-playground/validator.v9
 RUN go get -u github.com/go-sql-driver/mysql
 RUN go get github.com/jmoiron/sqlx
 
-WORKDIR /go/src/github.com/Team-Fruit/SignPicDB/
+WORKDIR /go/src/github.com/Team-Fruit/SignPicDB/web/
 COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o app .

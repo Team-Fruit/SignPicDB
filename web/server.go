@@ -14,42 +14,10 @@ import (
 )
 
 type (
-	User struct {
-		UUID            string `db:"uuid" query:"id" validate:"required,mcuuid"`
-		UserName        string `db:"username" query:"name" validate:"required"`
-		IP              string `db:"ip"`
-		VersionMod      string `db:"version_mod" query:"vmod" validate:"required" json:"-"`
-		VersionModMC    string `db:"version_mod_mc" query:"vmodmc" validate:"required" json:"-"`
-		VersionModForge string `db:"version_mod_forge" query:"vmodforge" validate:"required" json:"-"`
-		VersionMC       string `db:"version_mc" query:"vmc" validate:"required" json:"-"`
-		VersionForge    string `db:"version_forge" query:"vforge" validate:"required" json:"-"`
-		Message         string `db:"message"`
-		CreatedAt       string `db:"created_at"`
-		UpdatedAt       string `db:"updated_at"`
-		UpdatedCount    uint   `db:"updated_count"`
-	}
-	Where struct {
-		UUID              string `query:"id" validate:"omitempty,mcuuid" db:"uuid" operator:"="`
-		UserName          string `query:"name" db:"username" operator:"="`
-		IP                string `query:"ip" validate:"omitempty,ip" db:"ip" operator:"="`
-		// Version_Mod       string `query:"vmod" db:"version_mod" operator:"="`
-		// Version_Mod_MC    string `query:"vmodmc" db:"version_mod_mc" operator:"="`
-		// Version_Mod_Forge string `query:"vmodforge" db:"version_mod_forge" operator:"="`
-		// Version_MC        string `query:"vmc" db:"version_mc" operator:"="`
-		// Version_Forge     string `query:"vforge" db:"version_forge" operator:"="`
-		// Since             string `query:"since" db:"updated_at" operator:">="`
-		// Until             string `query:"until" db:"updated_at" operator:"<="`
-	}
-	Count struct {
-		Count uint64
-	}
-
 	CustomValidator struct {
 		validator *validator.Validate
 	}
 )
-
-var db *sqlx.DB
 
 func (cv *CustomValidator) Validate(i interface{}) error {
 	return cv.validator.Struct(i)
@@ -67,7 +35,7 @@ func uuidValidator(fl validator.FieldLevel) bool {
 }
 
 func main() {
-	db = sqlx.MustConnect("mysql", "signpic:@tcp(db:3306)/signpic_db")
+	db := sqlx.MustConnect("mysql", "signpic:@tcp(db:3306)/signpic_db")
 	defer db.Close()
 
 	e := echo.New()
@@ -79,6 +47,9 @@ func main() {
 	validator.RegisterValidation("mcuuid", uuidValidator)
 	e.Validator = &CustomValidator{validator: validator}
 
+	uh := users.NewHandler(user.NewUserModel(db))
+	mh := messages.NewHandler(user.NewMessageModel(db))
+	
 	e.POST("/msg", root)
 	e.GET("/msg", root)
 	e.GET("/list", list)
