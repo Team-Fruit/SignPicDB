@@ -38,11 +38,11 @@ func (h *handler) GetList(c echo.Context) (err error) {
 		pagesize = 100
 	}
 
-	w := new(models.UserWhere)
-	if err = c.Bind(w); err != nil {
+	w := models.UserWhere{}
+	if err = c.Bind(&w); err != nil {
 		return
 	}
-	if err = c.Validate(w); err != nil {
+	if err = c.Validate(&w); err != nil {
 		return
 	}
 
@@ -58,11 +58,11 @@ func (h *handler) GetList(c echo.Context) (err error) {
 }
 
 func (h *handler) GetUniqueUserCount(c echo.Context) (err error) {
-	w := new(models.UserWhere)
-	if err = c.Bind(w); err != nil {
+	w := models.UserWhere{}
+	if err = c.Bind(&w); err != nil {
 		return
 	}
-	if err = c.Validate(w); err != nil {
+	if err = c.Validate(&w); err != nil {
 		return
 	}
 	

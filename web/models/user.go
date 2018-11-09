@@ -20,14 +20,14 @@ type (
 	}
 
 	UserWhere struct {
-		UUID     string `db:"uuid" operator:"="`
-		UserName string `db:"username" operator:"="`
-		IP       string `db:"ip" operator:"="`
+		UUID     string `db:"uuid" query:"id" validate:"omitempty,mcuuid" operator:"="`
+		UserName string `db:"username" query:"name" operator:"="`
+		IP       string `db:"ip" query:"ip" validate:"omitempty,ip" operator:"="`
 	}
 )
 
 
-func (u *Model) FindUsers(where *UserWhere, offset uint, limit uint) (user []User, err error) {
+func (u *Model) FindUsers(where UserWhere, offset uint, limit uint) (user []User, err error) {
 	ws := where.toSql()
 	if ws != "" {
 		var nstmt *sqlx.NamedStmt
@@ -36,12 +36,12 @@ func (u *Model) FindUsers(where *UserWhere, offset uint, limit uint) (user []Use
 		}
 		nstmt.Select(&user, where)
 	} else {
-		err = u.db.Select(&u, fmt.Sprintf("SELECT * FROM user LIMIT %d,%d", offset, limit))
+		err = u.db.Select(&user, fmt.Sprintf("SELECT * FROM user LIMIT %d,%d", offset, limit))
 	}
 	return
 }
 
-func (u *Model) CountUniqueUser(where *UserWhere) (count uint, err error) {
+func (u *Model) CountUniqueUser(where UserWhere) (count uint, err error) {
 	ws := where.toSql()
 	if ws != "" {
 		var nstmt *sqlx.NamedStmt

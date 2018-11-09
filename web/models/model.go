@@ -11,8 +11,8 @@ type (
 
 	Database interface {
 		PutMessage(m *Message) error
-		FindUsers(where *UserWhere, offset uint, limit uint) (user []User, err error)
-		CountUniqueUser(where *UserWhere) (count uint, err error)
+		FindUsers(where UserWhere, offset uint, limit uint) (user []User, err error)
+		CountUniqueUser(where UserWhere) (count uint, err error)
 	}
 )
 
