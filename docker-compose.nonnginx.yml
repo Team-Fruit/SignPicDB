@@ -1,0 +1,23 @@
+version: '3'
+services:
+    web:
+        build: ./web
+        ports:
+            - '8082:8082'
+        environment:
+            ALIAS: '/'
+            PORT: '8082'
+        depends_on:
+            - db
+        restart: always
+    db:
+        build: ./db
+        expose:
+            - '3306'
+        volumes:
+            - db:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: 'password'
+        restart: always
+volumes:
+    db:
