@@ -1,27 +1,18 @@
-package users
+package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo"
-	"github.com/Team-Fruit/SignPicDB/models"
+	"github.com/Team-Fruit/SignPicDB/web/models"
 )
 
-type (
-	count struct {
-		count uint
-	}
-
-	handler struct {
-		UserModel user.UserModelImpl
-	}
-)
-
-func NewHandler(u user.UserModelImpl) *handler {
-	return &handler{u}
+type count struct {
+	Count uint `json:"count"`
 }
 
-func (h *handler) GetList(c echo.Context) error {
+func (h *handler) GetList(c echo.Context) (err error) {
 	var page, pagesize uint64
 	if pagestr := c.QueryParam("page"); pagestr != "" {
 		if page, err = strconv.ParseUint(pagestr, 10, 32); err != nil {
@@ -47,7 +38,7 @@ func (h *handler) GetList(c echo.Context) error {
 		pagesize = 100
 	}
 
-	w := new(user.Where)
+	w := new(models.UserWhere)
 	if err = c.Bind(w); err != nil {
 		return
 	}
@@ -55,27 +46,29 @@ func (h *handler) GetList(c echo.Context) error {
 		return
 	}
 
-	var l []user.User
-	if l, err = h.UserModel.Find(w, pagesize*(page-1), pagesize); err != nil {
+	var l []models.User
+	if l, err = h.Model.FindUsers(w, uint(pagesize*(page-1)), uint(pagesize)); err != nil {
 		return
 	}
 	if len(l) == 0 {
-		l = make([]user.User, 0)
+		l = make([]models.User, 0)
 	}
 
 	return c.JSON(http.StatusOK, l)
 }
 
-func (h *handler) GetUniqueUserCount(c echo.Context) error {
-	w := new(Where)
+func (h *handler) GetUniqueUserCount(c echo.Context) (err error) {
+	w := new(models.UserWhere)
 	if err = c.Bind(w); err != nil {
 		return
 	}
 	if err = c.Validate(w); err != nil {
 		return
 	}
-	if count, err := h.UserModel.CountUniqueUser(w); err != nil {
-		return err
+	
+	var cnt uint
+	if cnt, err = h.Model.CountUniqueUser(w); err != nil {
+		return
 	}
-	return c.JSON(http.StatusOK, count{count})
+	return c.JSON(http.StatusOK, count{cnt})
 }

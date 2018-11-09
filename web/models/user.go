@@ -1,15 +1,14 @@
-package user
+package models
 
 import (
+	"fmt"
+	"reflect"
+	"strings"
+
 	"github.com/jmoiron/sqlx"
 )
 
 type (
-	UserModelImpl interface {
-		Find(where UserWhere, offset uint, limit uint) (user []User, err error)
-		CountUniqueUser(where UserWhere) (count uint, err error)
-	}
-
 	User struct {
 		UUID         string `json:"uuid" db:"uuid"`
 		UserName     string `json:"username" db:"username"`
@@ -25,42 +24,33 @@ type (
 		UserName string `db:"username" operator:"="`
 		IP       string `db:"ip" operator:"="`
 	}
-
-	UserModel struct {
-		db *sqlx.DB
-	}
 )
 
-func NewUserModel(db *sqlx.DB) *UserModel {
-	return &UserModel{
-		db: db,
-	}
-}
 
-func (u *UserModel) Find(where UserWhere, offset uint, limit uint) (user []User, err error) {
+func (u *Model) FindUsers(where *UserWhere, offset uint, limit uint) (user []User, err error) {
 	ws := where.toSql()
 	if ws != "" {
 		var nstmt *sqlx.NamedStmt
 		if nstmt, err = u.db.PrepareNamed(fmt.Sprintf("SELECT * FROM user WHERE %s LIMIT %d,%d", ws, offset, limit)); err != nil {
 			return
 		}
-		nstmt.Select(&u, w)
+		nstmt.Select(&user, where)
 	} else {
 		err = u.db.Select(&u, fmt.Sprintf("SELECT * FROM user LIMIT %d,%d", offset, limit))
 	}
 	return
 }
 
-func (u *UserModel) CountUniqueUser(where UserWhere) (count uint, err error) {
+func (u *Model) CountUniqueUser(where *UserWhere) (count uint, err error) {
 	ws := where.toSql()
 	if ws != "" {
 		var nstmt *sqlx.NamedStmt
 		if nstmt, err = u.db.PrepareNamed("SELECT count(uuid) FROM user WHERE "+ ws); err != nil {
 			return
 		}
-		nstmt.Get(&c, w)
+		nstmt.Get(&count, where)
 	} else {
-		err = u.db.Get(&c, "SELECT count(uuid) FROM user")
+		err = u.db.Get(&count, "SELECT count(uuid) FROM user")
 	}
 	return
 }

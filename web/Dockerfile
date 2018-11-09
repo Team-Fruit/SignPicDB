@@ -24,7 +24,7 @@ RUN apk update && apk add -y wget \
     && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
-COPY --from=builder /go/src/github.com/Team-Fruit/SignPicDB/app .
+COPY --from=builder /go/src/github.com/Team-Fruit/SignPicDB/web/app .
 
 ENTRYPOINT ["dockerize", "-wait", "tcp://db:3306"]
 CMD ["./app"]

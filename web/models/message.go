@@ -1,8 +1,4 @@
-package message
-
-import (
-	"github.com/jmoiron/sqlx"
-)
+package models
 
 type (
 	MessageModelImpl interface {
@@ -23,32 +19,22 @@ type (
 		UpdatedAt       string `json:"updated_at"`
 		UpdatedCount    uint   `json:"updated_count"`
 	}
-
-	MessageModel struct {
-		db *sqlx.DB
-	}
 )
 
-func NewMessageModel(db *sqlx.DB) *MessageModel {
-	return &MessageModel{
-		db: db,
-	}
-}
 
-func (m *MessageModel) Push(msg Message) {
-	tx := db.MustBegin()
+func (m *Model) PutMessage(msg *Message) error {
+	tx := m.db.MustBegin()
 	tx.MustExec(`INSERT INTO user (uuid, username, ip, message) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE username = VALUES(username), ip = VALUES(ip), message = VALUES(message), updated_at = NOW(), updated_count = updated_count+1`, 
-		u.UUID,
-		u.UserName,
-		u.IP,
-		u.Message)
+		msg.UUID,
+		msg.UserName,
+		msg.IP,
+		msg.Message)
 	tx.MustExec(`INSERT INTO user__version_mc__version_mod (uuid, version_mod, version_mod_mc, version_mod_forge, version_mc, version_forge) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE version_mod = VALUES(version_mod), version_mod_mc = VALUES(version_mod_mc), version_mod_forge = VALUES(version_mod_forge), version_mc = VALUES(version_mc), version_forge = (version_forge), updated_at = NOW(), updated_count = updated_count + 1`,
-		u.UUID,
-		u.VersionMod,
-		u.VersionModMC,
-		u.VersionModForge,
-		u.VersionMC,
-		u.VersionForge)
-	err = tx.Commit()
-	return
+		msg.UUID,
+		msg.VersionMod,
+		msg.VersionModMC,
+		msg.VersionModForge,
+		msg.VersionMC,
+		msg.VersionForge)
+	return tx.Commit()
 }
