@@ -52,8 +52,8 @@ func main() {
 
 	e.POST("/msg", h.PutMessage)
 	e.GET("/msg", h.PutMessage)
-	e.GET("/list", h.GetList)
-	e.GET("/list/count", h.GetUniqueUserCount)
+	e.GET("/users", h.GetList)
+	e.GET("/usercount", h.GetUniqueUserCount)
 
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }
