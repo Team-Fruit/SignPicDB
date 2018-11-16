@@ -24,6 +24,23 @@ type (
 		UserName string `db:"username" query:"name" operator:"="`
 		IP       string `db:"ip" query:"ip" validate:"omitempty,ip" operator:"="`
 	}
+
+	UserVersion struct {
+		UUID            string `json:"-" db:"uuid"`
+		VersionMod      string `json:"version_mod" db:"version_mod"`
+		VersiomModMC    string `json:"version_mod_mc" db:"version_mod_mc"`
+		VersionModForge string `json:"version_mod_forge" db:"version_mod_forge"`
+		VersionMC       string `json:"version_mc" db:"version_mc"`
+		VersionForge    string `json:"version_forge" db:"version_forge"`
+		CreatedAt       string `json:"created_at" db:"created_at"`
+		UpdatedAt       string `json:"updated_at" db:"updated_at"`
+		UpdatedCount    string `json:"updated_count" db:"updated_count"`
+	}
+
+	UserData struct {
+		User        *User
+		UserVersion *[]UserVersion
+	}
 )
 
 
@@ -52,6 +69,24 @@ func (u *Model) CountUniqueUser(where UserWhere) (count uint, err error) {
 	} else {
 		err = u.db.Get(&count, "SELECT count(uuid) FROM user")
 	}
+	return
+}
+
+func (u *Model) SumPlayCount() (count uint, err error) {
+	err = u.db.Get(&count, "SELECT SUM(updated_count) FROM user")
+	return
+}
+
+func (m *Model) GetUserData(id string) (userdata UserData, err error) {
+	u := User{}
+	if err = m.db.Get(&u, "SELECT * FROM user WHERE uuid=? OR username=? ORDER BY updated_at DESC LIMIT 1", id, id); err != nil {
+		return
+	}
+	uv := []UserVersion{}
+	if err = m.db.Select(&uv, "SELECT * FROM user__version_mc__version_mod WHERE uuid=?", u.UUID); err != nil {
+		return
+	}
+	userdata = UserData{User: &u, UserVersion: &uv}
 	return
 }
 

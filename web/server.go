@@ -53,7 +53,9 @@ func main() {
 	e.POST("/msg", h.PutMessage)
 	e.GET("/msg", h.PutMessage)
 	e.GET("/users", h.GetList)
+	e.GET("/users/:id", h.GetUser)
 	e.GET("/usercount", h.GetUniqueUserCount)
+	e.GET("/playcount", h.GetPlayCount)
 
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }

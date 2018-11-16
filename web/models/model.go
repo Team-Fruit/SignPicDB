@@ -13,6 +13,8 @@ type (
 		PutMessage(m *Message) error
 		FindUsers(where UserWhere, offset uint, limit uint) (user []User, err error)
 		CountUniqueUser(where UserWhere) (count uint, err error)
+		SumPlayCount() (count uint, err error)
+		GetUserData(id string) (userdata UserData, err error)
 	}
 )
 

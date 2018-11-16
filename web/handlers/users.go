@@ -3,14 +3,21 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"database/sql"
 
 	"github.com/labstack/echo"
 	"github.com/Team-Fruit/SignPicDB/web/models"
 )
 
-type count struct {
-	Count uint `json:"count"`
-}
+type (
+	count struct {
+		Count uint `json:"count"`
+	}
+
+	response struct {
+		Message string `json:"message"`
+	}
+)
 
 func (h *handler) GetList(c echo.Context) (err error) {
 	var page, pagesize uint64
@@ -57,6 +64,18 @@ func (h *handler) GetList(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, l)
 }
 
+func (h *handler) GetUser(c echo.Context) (err error) {
+	id := c.Param("id")
+	var data models.UserData
+	if data, err = h.Model.GetUserData(id); err != nil {
+		if err == sql.ErrNoRows {
+			return c.JSON(http.StatusNotFound, response{"Not Found"})
+		}
+		return
+	}
+	return c.JSON(http.StatusOK, data)
+}
+
 func (h *handler) GetUniqueUserCount(c echo.Context) (err error) {
 	w := models.UserWhere{}
 	if err = c.Bind(&w); err != nil {
@@ -72,3 +91,12 @@ func (h *handler) GetUniqueUserCount(c echo.Context) (err error) {
 	}
 	return c.JSON(http.StatusOK, count{cnt})
 }
+
+func (h *handler) GetPlayCount(c echo.Context) (err error) {
+	var cnt uint
+	if cnt, err = h.Model.SumPlayCount(); err != nil {
+	return
+	}
+	return c.JSON(http.StatusOK, count{cnt})
+}
+
