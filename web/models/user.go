@@ -38,8 +38,8 @@ type (
 	}
 
 	UserData struct {
-		User        *User
-		UserVersion *[]UserVersion
+		User        *User          `json:"user"`
+		UserVersion *[]UserVersion `json:"user_version"`
 	}
 )
 

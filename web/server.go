@@ -43,6 +43,7 @@ func main() {
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(middleware.CORS())
 
 	validator := validator.New()
 	validator.RegisterValidation("mcuuid", uuidValidator)
