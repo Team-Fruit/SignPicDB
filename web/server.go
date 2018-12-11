@@ -12,6 +12,7 @@ import (
 
 	"github.com/Team-Fruit/SignPicDB/web/handlers"
 	"github.com/Team-Fruit/SignPicDB/web/models"
+	"github.com/Team-Fruit/SignPicDB/web/ws"
 )
 
 type (
@@ -58,5 +59,10 @@ func main() {
 	e.GET("/usercount", h.GetUniqueUserCount)
 	e.GET("/playcount", h.GetPlayCount)
 
+	hub := ws.NewHub()
+	go hub.Run()
+	e.GET("/ws", func(c echo.Context) error {
+		return ws.ServeWs(hub, c)
+	})
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }

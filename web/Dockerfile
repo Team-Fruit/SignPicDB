@@ -1,10 +1,11 @@
 FROM golang:stretch as builder
 
-RUN go get -u github.com/labstack/echo
-RUN go get -u github.com/dgrijalva/jwt-go
-RUN go get gopkg.in/go-playground/validator.v9
-RUN go get -u github.com/go-sql-driver/mysql
-RUN go get github.com/jmoiron/sqlx
+RUN go get -u github.com/labstack/echo \
+              github.com/dgrijalva/jwt-go \
+               github.com/go-sql-driver/mysql
+RUN go get gopkg.in/go-playground/validator.v9 \
+           github.com/jmoiron/sqlx \
+           github.com/gorilla/websocket
 
 WORKDIR /go/src/github.com/Team-Fruit/SignPicDB/web/
 COPY . .

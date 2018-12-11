@@ -5,6 +5,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/Team-Fruit/SignPicDB/web/models"
+	"github.com/Team-Fruit/SignPicDB/web/ws"
 )
 
 func (h *handler) PutMessage(c echo.Context) (err error) {
@@ -22,6 +23,9 @@ func (h *handler) PutMessage(c echo.Context) (err error) {
 	if err = h.Model.PutMessage(m); err != nil {
 		return
 	}
+
+	a := ws.AnalyticsData{PlayCount: 1}
+	ws.AnalyticsChan <- a
 
 	return c.JSON(http.StatusOK, m)
 }
