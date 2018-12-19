@@ -7,6 +7,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/gorilla/websocket"
+	"github.com/Team-Fruit/SignPicDB/web/models"
 )
 
 const (
@@ -25,10 +26,6 @@ var (
 	space   = []byte{' '}
 )
 
-type AnalyticsData struct {
-	PlayCount int `json:"playcount"`
-}
-
 type Client struct {
 	hub  *Hub
 	conn *websocket.Conn
@@ -41,7 +38,7 @@ var (
 			return true
 		},
 	}
-	AnalyticsChan = make(chan AnalyticsData)
+	AnalyticsChan = make(chan models.AnalyticsData)
 )
 
 // writePump pumps messages from the hub to the websocket connection.

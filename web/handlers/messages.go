@@ -24,7 +24,10 @@ func (h *handler) PutMessage(c echo.Context) (err error) {
 		return
 	}
 
-	a := ws.AnalyticsData{PlayCount: 1}
+	var a models.AnalyticsData
+	if a, err = h.Model.GetAnalyticsData(); err != nil {
+		return
+	}
 	ws.AnalyticsChan <- a
 
 	return c.JSON(http.StatusOK, m)
