@@ -15,6 +15,11 @@ type (
 		CountUniqueUser(where UserWhere) (count uint, err error)
 		SumPlayCount() (count uint, err error)
 		GetUserData(id string) (userdata UserData, err error)
+		GetPlayCount() (c uint, err error)
+		GetUserCount() (c uint, err error)
+		GetMostPlayedMCVersion() (v string, err error)
+		GetMostPlayedModVersion() (v string, err error)
+		GetAnalyticsData() (d AnalyticsData, err error)
 	}
 )
 

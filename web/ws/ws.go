@@ -107,7 +107,7 @@ func ServeWs(hub *Hub, c echo.Context) error {
 	}
 	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
 	client.hub.register <- client
-	
+
 	go client.writePump()
 	go client.broadcast()
 
