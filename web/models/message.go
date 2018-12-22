@@ -8,7 +8,7 @@ type (
 	Message struct {
 		UUID            string `json:"uuid" query:"id" validate:"required,mcuuid"`
 		UserName        string `json:"username" query:"name" validate:"required"`
-		IP              string `json:"ip"`
+		IP              string `json:"-"`
 		VersionMod      string `json:"version_mod" query:"vmod" validate:"required" json:"-"`
 		VersionModMC    string `json:"version_mod_mc" query:"vmodmc" validate:"required" json:"-"`
 		VersionModForge string `json:"version_mod_forge" query:"vmodforge" validate:"required" json:"-"`
