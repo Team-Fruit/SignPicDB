@@ -12,7 +12,7 @@ type (
 	User struct {
 		UUID         string `json:"uuid" db:"uuid"`
 		UserName     string `json:"username" db:"username"`
-		IP           string `json:"ip" db:"ip"`
+		IP           string `json:"-" db:"ip"`
 		Message      string `json:"message" db:"message"`
 		CreatedAt    string `json:"created_at" db:"created_at"`
 		UpdatedAt    string `json:"updated_at" db:"updated_at"`
