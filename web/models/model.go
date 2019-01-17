@@ -20,6 +20,7 @@ type (
 		GetMostPlayedMCVersion() (v string, err error)
 		GetMostPlayedModVersion() (v string, err error)
 		GetAnalyticsData() (d AnalyticsData, err error)
+		GetUserTransition() (d []AccumData, err error)
 	}
 )
 

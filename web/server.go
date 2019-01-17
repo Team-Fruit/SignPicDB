@@ -59,6 +59,7 @@ func main() {
 	e.GET("/usercount", h.GetUniqueUserCount)
 	e.GET("/playcount", h.GetPlayCount)
 	e.GET("/analytics", h.GetAnalytics)
+	e.GET("/analytics/transition", h.GetUserTransition)
 
 	hub := ws.NewHub()
 	go hub.Run()

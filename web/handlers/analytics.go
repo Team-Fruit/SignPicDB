@@ -14,3 +14,11 @@ func (h *handler) GetAnalytics(c echo.Context) (err error) {
 	}
 	return c.JSON(http.StatusOK, d)
 }
+
+func (h *handler) GetUserTransition(c echo.Context) (err error) {
+	var d []models.AccumData
+	if d, err = h.Model.GetUserTransition(); err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, d)
+}

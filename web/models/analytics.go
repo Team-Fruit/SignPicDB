@@ -2,10 +2,16 @@ package models
 
 type (
 	AnalyticsData struct {
-		PlayCount  uint   `json:"playcount"`
-		UserCount  uint   `json:"usercount"`
-		MCVersion  string `json:"mcversion"`
-		ModVersion string `json:"modversion"`
+		PlayCount  uint       `json:"playcount"`
+		UserCount  uint       `json:"usercount"`
+		MCVersion  string     `json:"mcversion"`
+		ModVersion string     `json:"modversion"`
+		Users      []AccumData `json:"user"`
+	}
+	AccumData struct {
+		Date  string `db:"accum_date" json:"date"`
+		Count uint   `db:"count" json:"count"`
+		Accum uint   `db:"accum" json:"accum"`
 	}
 )
 
@@ -29,6 +35,13 @@ func (m *Model) GetMostPlayedModVersion() (v string, err error) {
 	return
 }
 
+func (m *Model) GetUserTransition() (d []AccumData, err error) {
+	if err = m.db.Select(&d, "SELECT t1.accum_date, t1.count, SUM(t2.count) AS accum FROM ( SELECT DATE(created_at) AS accum_date, COUNT(*) AS count FROM user GROUP BY accum_date ORDER BY accum_date ) AS t1 JOIN ( SELECT DATE(created_at) AS accum_date, COUNT(*) AS count FROM user GROUP BY accum_date ORDER BY accum_date ) AS t2 ON t1.accum_date >= t2.accum_date WHERE t1.accum_date >= (NOW() - INTERVAL 1 MONTH) GROUP BY 1 ORDER BY 1"); err != nil {
+		return
+	}
+	return
+}
+
 func (m *Model) GetAnalyticsData() (d AnalyticsData, err error) {
 	a := new(AnalyticsData)
 	if a.PlayCount, err = m.GetPlayCount(); err != nil {
@@ -43,5 +56,9 @@ func (m *Model) GetAnalyticsData() (d AnalyticsData, err error) {
 	if a.ModVersion, err = m.GetMostPlayedModVersion(); err != nil {
 		return
 	}
+	if a.Users, err = m.GetUserTransition(); err != nil {
+		return
+	}
 	return *a, nil
 }
+
