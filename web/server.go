@@ -13,6 +13,9 @@ import (
 	"github.com/Team-Fruit/SignPicDB/web/handlers"
 	"github.com/Team-Fruit/SignPicDB/web/models"
 	"github.com/Team-Fruit/SignPicDB/web/ws"
+
+	"github.com/rakyll/statik/fs"
+	_ "github.com/Team-Fruit/SignPicDB/web/statik"
 )
 
 type (
@@ -39,6 +42,11 @@ func uuidValidator(fl validator.FieldLevel) bool {
 func main() {
 	db := sqlx.MustConnect("mysql", "signpic:@tcp(db:3306)/signpic_db")
 	defer db.Close()
+
+	_, err := fs.New()
+	if err != nil {
+		panic(err)
+	}
 
 	e := echo.New()
 
