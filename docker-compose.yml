@@ -1,4 +1,4 @@
-version: '3'
+version: '3.5'
 services:
     web:
         build: ./web
@@ -10,20 +10,24 @@ services:
         depends_on:
             - db
         restart: always
+        networks:
+            - proxy
+            - backend
     db:
         build: ./db
-        expose:
+        ports:
             - '3306'
         volumes:
             - db:/var/lib/mysql
         environment:
             MYSQL_ROOT_PASSWORD: 'password'
         restart: always
+        networks:
+            - backend
 volumes:
     db:
 
 networks:
-    default:
-        external:
-            name: nginx_reverse_proxy
-
+    proxy:
+        name: nginx_reverse_proxy
+    backend:
