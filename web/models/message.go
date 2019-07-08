@@ -1,10 +1,6 @@
 package models
 
 type (
-	MessageModelImpl interface {
-		Post(msg Message)
-	}
-
 	Message struct {
 		UUID            string `json:"uuid" query:"id" validate:"required,mcuuid"`
 		UserName        string `json:"username" query:"name" validate:"required"`
