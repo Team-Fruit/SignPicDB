@@ -1,4 +1,4 @@
-CREATE USER `signpic`@`%`;
+CREATE USER `signpic`@`%` IDENTIFIED BY 'password';
 GRANT INSERT,SELECT,UPDATE,DELETE ON `signpic_db`.* TO `signpic`@`%`;
 
 CREATE DATABASE IF NOT EXISTS `signpic_db`;
